@@ -3,8 +3,7 @@ import sys
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QFormLayout, QLineEdit, QLabel, QHBoxLayout, \
-    QPushButton, QFrame, QGroupBox, QDateEdit, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QMessageBox, \
-    QSpacerItem, QSizePolicy
+    QPushButton, QFrame, QGroupBox, QDateEdit, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QMessageBox
 
 import json
 import csv
@@ -16,7 +15,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("PowerPoint MVP")  # Set window title
         self.setStyleSheet(f"background-color: {color}	;")
-        self.setGeometry(0, 0, 1530, 10)  # Set window size and position
+        self.setGeometry(0, 10, 1430, 0)  # Set window size and position
 
         self.completed_setups = set()  # Track completed setups by their names
         self.user_details = {}  # Store the user's details (Device SN, Operator, Date)
@@ -63,7 +62,7 @@ class MainWindow(QWidget):
         self.top_button_layout.setAlignment(Qt.AlignRight)  # Align the button to the right
         generate_report_button = QPushButton("Generate Report")
         generate_report_button.setStyleSheet(
-            "background-color: #4CAF50; color: white; padding:20px; border-radius: 50px;")
+            "background-color: #4CAF50; color: white; padding: 20px; border-radius: 5px;")
         self.top_button_layout.addWidget(generate_report_button)
 
         # Add the top button layout to the main layout
@@ -156,12 +155,11 @@ class MainWindow(QWidget):
             """)
 
     def setup_test_select_section(self):
-        # Color Background for the test selection section
+        # Setups form color Background (Setup #2 to Setup #8)
         color = "#3D75A2"
-        setups_length = 600
         """Set up the test selection section with button-like rows and checkboxes."""
         test_select_group = QGroupBox("Select Test Setup")
-        test_select_group.setStyleSheet(f"background-color:{color}; color: white; padding: 20px;")
+        test_select_group.setStyleSheet(f"background-color:{color} ; color: white; padding: 100px;")
         test_select_layout = QVBoxLayout()
 
         test_setups = [
@@ -175,45 +173,17 @@ class MainWindow(QWidget):
         ]
 
         self.setup_buttons = {}  # Store buttons for dynamic style updates
-        self.indicators = {}  # Store indicators for styling
 
-        # Create buttons and indicators for each test setup
+        # Create buttons for each test setup
         for setup in test_setups:
-            # Horizontal layout for each row (aligned to the left)
-            row_layout = QHBoxLayout()
-            row_layout.setAlignment(Qt.AlignLeft)  # Align all content to the left
-
-            # Button for the test setup
             button = QPushButton(setup)
             self.setup_buttons[setup] = button  # Store the button for later reference
             self.update_button_style(setup)  # Apply the appropriate style based on completion status
+
             button.setEnabled(False)  # Disable the buttons initially
             button.setStyleSheet("background-color: #cccccc; color: black; padding: 10px; border-radius: 5px;")
-
-            # Set a fixed width for the button to ensure consistent length
-            button.setFixedWidth(setups_length)  # Adjust the width as per the fixed size you need
-
             button.clicked.connect(lambda checked, text=setup: self.redirect_to_screen(text))
-
-            # Add button to the row layout (button aligned to left side)
-            row_layout.addWidget(button)
-
-            # Add a spacer between the button and indicator to ensure consistent spacing
-            spacer = QSpacerItem(20, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
-            row_layout.addItem(spacer)
-
-            # Circular indicator
-            indicator = QLabel()
-            indicator.setFixedSize(30, 30)  # Circle size
-            indicator.setStyleSheet(
-                "background-color: #3D75A2; border: 2px solid white; border-radius: 15px;")  # Yellow circle with red border
-            self.indicators[setup] = indicator  # Store indicator for later updates
-
-            # Add indicator to the row layout (indicator aligned to left side, after the button)
-            row_layout.addWidget(indicator)
-
-            # Add the row layout to the vertical layout
-            test_select_layout.addLayout(row_layout)
+            test_select_layout.addWidget(button)
 
         # Set the layout for the test select group
         test_select_group.setLayout(test_select_layout)
@@ -224,13 +194,9 @@ class MainWindow(QWidget):
     def update_button_style(self, setup):
         """Update the button's color based on its completion status."""
         if setup in self.completed_setups:
-            # also change the color of indicator
-            self.indicators[setup].setStyleSheet(
-                "background-color: #FFFFFF; border: 2px solid white; border-radius: 15px;"
+            self.setup_buttons[setup].setStyleSheet(
+                "background-color: orange; color: white; padding: 10px; border-radius: 5px;"
             )
-            # self.setup_buttons[setup].setStyleSheet(
-            #     "background-color: orange; color: white; padding: 10px; border-radius: 5px;"
-            # )
         else:
             self.setup_buttons[setup].setStyleSheet(
                 """
@@ -282,11 +248,9 @@ class MainWindow(QWidget):
         self.show_popup("Data Saved! Setups enabled now")
 
         # Enable the test setup buttons after submitting
-        for counter, button in enumerate(self.setup_buttons.values()):
-            if counter > 2:
-                continue
+        for button in self.setup_buttons.values():
             button.setEnabled(True)
-            button.setStyleSheet("background-color: #FFFFFF; color: black; padding: 10px; border-radius: 5px;")
+            button.setStyleSheet("background-color: #3b7e99; color: white; padding: 10px; border-radius: 5px;")
 
         # Optionally, disable the form section after submission
         self.device_sn.setEnabled(False)
@@ -297,7 +261,7 @@ class MainWindow(QWidget):
         """Show a popup dialog with the given message."""
         dialog = QDialog(self)
         dialog.setWindowTitle("Info")
-        dialog.setStyleSheet("background-color: #3D75A2; color: white;")
+        dialog.setStyleSheet("background-color: lightgreen; color: black;")
         layout = QVBoxLayout(dialog)
 
         label = QLabel(message)
@@ -391,7 +355,7 @@ class SetupScreenInside(QWidget):
         super().__init__()
         self.parent = parent  # Reference to the main screen
         self.setGeometry(0, 10, 1430, 0)
-        self.setStyleSheet("background-color: #3D75A2;")
+        self.setStyleSheet("background-color: lightblue;")
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -399,7 +363,7 @@ class SetupScreenInside(QWidget):
         # Add a Back button
         back_button = QPushButton("Back to Main Screen")
         back_button.setStyleSheet(
-            "background-color: white; color: black; padding: 10px; border-radius: 5px;"
+            "background-color: #f44336; color: white; padding: 10px; border-radius: 5px;"
         )
         back_button.clicked.connect(self.go_back)
         self.layout.addWidget(back_button)
